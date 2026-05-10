@@ -24,9 +24,11 @@ def count_position_and_mutation_common(rows):
   position_count = {}
   mutation_count = {}
   mutation_position_count = {}
+  mutation_type_count = {}
+  mutation_type_by_mutations_count ={}
   counted_positions = set()
   counted_mutations = set()
-  #top_10 = {}
+  counted_mutation_types = set()
   for row in rows:
     sample_id = row[2]
     protein_change = row[5]
@@ -39,6 +41,7 @@ def count_position_and_mutation_common(rows):
           position_count[position] = 0
         position_count[position] += 1
       mutation_key = (sample_id, protein_change)
+      mutation_type = row[10]
       if mutation_key not in counted_mutations:
         counted_mutations.add(mutation_key)
         if protein_change not in mutation_count:
@@ -47,7 +50,17 @@ def count_position_and_mutation_common(rows):
         if position not in mutation_position_count:
           mutation_position_count[position] = 0
         mutation_position_count[position] += 1
-  return position_count, mutation_count, mutation_position_count
+        if mutation_type not in mutation_type_by_mutations_count:
+          mutation_type_by_mutations_count[mutation_type] = 0
+        mutation_type_by_mutations_count[mutation_type] += 1
+   #   mutation_type = row[10]
+      type_key = (sample_id, mutation_type)
+      if type not in counted_mutation_types:
+        counted_mutation_types.add(type_key)
+        if mutation_type not in mutation_type_count:
+          mutation_type_count[mutation_type] = 0
+        mutation_type_count[mutation_type]+=1
+  return position_count, mutation_count, mutation_position_count, mutation_type_count, mutation_type_by_mutations_count
 
 def top(count_dict, n=10):
   count_dict = count_dict.copy()
@@ -73,13 +86,16 @@ def per(count_dict):
 
 reader = csv.reader(File_lung, delimiter="\t")
 rows = list(reader)
-position_count, mutation_count, mutation_position_count = count_position_and_mutation_common(rows)
+position_count, mutation_count, mutation_position_count, mutation_type_count, mutation_type_by_mutations_count = count_position_and_mutation_common(rows)
 position_per = per(position_count)
 mutation_per = per(mutation_count)
 mutation_position_per = per(mutation_position_count)
+mutation_type_per = per(mutation_type_count)
+mutation_type_by_mutations_per = per(mutation_type_by_mutations_count)
 top_positions = top(position_count)
 top_mutations = top(mutation_count)
 top_positions_by_mutations = top(mutation_position_per)
+#top_mutations_type = top(mutation_type_count)
 
 print("Top positions by patients:")
 print(top_positions)
@@ -89,8 +105,22 @@ print(top_mutations)
 print()
 print("Top positions by mutations:")
 print(top_positions_by_mutations)
-
-
+print()
+print("Mutation types:")
+print(mutation_type_count)
+print()
+print("Mutation types percentages:")
+print(mutation_type_per)
+print()
+print("Mutation types by mutations:")
+print(mutation_type_by_mutations_count)
+print()
+print("Mutation types by mutations percentages:")
+print(mutation_type_by_mutations_per)
+print()
+print("Top positions with percentages:")
+for position in top_positions:
+  print(position, top_positions[position], round(position_per[position], 2))
 
 #test_dict = {
  #   273: 267,
