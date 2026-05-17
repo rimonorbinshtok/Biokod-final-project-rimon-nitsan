@@ -2,7 +2,7 @@ import re
 import csv
 
 File_lung = open("data/cBioPorta_TP53_LungCnacer_table.tsv","r")
-File_breast = open("data/cBioPortal_breast_cancer_mutations.tsv","r")
+File_breast = open("data/bioportal breast cancer.tsv","r")
 output_file = open("results/output_file.txt","w")
 
 def Get_position(Protein_Change):
